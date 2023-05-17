@@ -19,10 +19,12 @@ android {
     productFlavors {
         "default" {
             isDefault true
+			applicationIdSuffix ".ei.plus"
         }
         api29 {
             targetSdkVersion 29
             versionNameSuffix "-oldapi"
+			applicationIdSuffix ".ei.plus"
         }
     }
 
