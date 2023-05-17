@@ -931,26 +931,12 @@ class MPVActivity : AppCompatActivity(), MPVLib.EventObserver, TouchGesturesObse
             onloadCommands.add(arrayOf("set", "start", pos.toString()))
         }
 
-        // support some common mpv options
+        // pass every string key that starts with -- to mpv
         var intentOptions = mutableListOf<Pair<String, String>>()
-        val allowedIntentOptions = arrayOf(
-            "--sub-file",
-            "--sub-files",
-            "--http-header-fields",
-            "--user-agent",
-            "--referrer",
-            "--media-title",
-            "--force-media-title",
-            "--tls-verify",
-            "--resume-playback",
-            "--force-seekable",
-            "--cookies"
-        )
-        for (option in allowedIntentOptions) {
-            if (extras.containsKey(option)) {
-                extras.getString(option)?.let { value ->
-                    intentOptions.add(Pair(option, value))
-                }
+        val allIntentOptions = extras.keySet().filter { it.startsWith("--") }
+        for (option in allIntentOptions) {
+            extras.getString(option)?.let { value ->
+                intentOptions.add(Pair(option, value))
             }
         }
         // also support title, standard among other android players
