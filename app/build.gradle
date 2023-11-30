@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 ext.abiCodes = ["armeabi-v7a": 1, "arm64-v8a": 2, "x86":3, "x86_64":4]
+ext.universalBase = 8000
 
 android {
     namespace 'is.xyz.mpv'
@@ -9,9 +10,9 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 31
-        versionCode 30
-        versionName "2023-02-27-release"
+        targetSdkVersion 33
+        versionCode 33
+        versionName "2023-11-30-release"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -44,6 +45,15 @@ android {
             universalApk true // build an APK with all ABIs too
         }
     }
+
+    // https://youtrack.jetbrains.com/issue/KT-55947
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+        kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+    }
 }
 
 // Map versionCode so each ABI gets a different one
@@ -52,15 +62,17 @@ import com.android.build.VariantOutput
 android.applicationVariants.all { variant ->
     variant.outputs.each { output ->
         def base = project.ext.abiCodes.get(output.getFilter(VariantOutput.ABI))
-        // universal APK keeps the original versionCode
+        // universal APK just gets a constant added to it
         if (base != null)
             output.versionCodeOverride = base * 1000 + variant.versionCode
+        else
+            output.versionCodeOverride = universalBase + variant.versionCode
     }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.recyclerview:recyclerview:1.3.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
     implementation 'androidx.media:media:1.6.0'
 }

@@ -1,6 +1,6 @@
 # mpv for Android
 
-[![Build Status](https://api.travis-ci.com/mpv-android/mpv-android.svg?branch=master)](https://app.travis-ci.com/github/mpv-android/mpv-android)
+[![Build Status](https://github.com/mpv-android/mpv-android/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/mpv-android/mpv-android/actions/workflows/build.yml)
 
 mpv-android is a video player for Android based on [libmpv](https://github.com/mpv-player/mpv).
 
@@ -9,6 +9,7 @@ mpv-android is a video player for Android based on [libmpv](https://github.com/m
 * Hardware and software video decoding
 * Gesture-based seeking, volume/brightness control and more
 * libass support for styled subtitles
+* Secondary (or dual) subtitle support
 * Advanced video settings (interpolation, debanding, scalers, ...)
 * Play network streams with the "Open URL" function
 * Background playback, Picture-in-Picture, keyboard input supported
