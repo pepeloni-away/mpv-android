@@ -13,9 +13,12 @@
     <string name="dialog_no">No</string>
     <string name="dialog_prev">Prev</string>
     <string name="dialog_next">Next</string>
+    <string name="dialog_reset">Reset</string>
     <string name="track_audio">Audio</string>
-    <string name="track_subs">Subs</string>
+    <string name="track_subs">Subs</string> <!-- short for "Subtitles" -->
     <string name="track_off">Off</string>
+    <string name="track_primary">Primary</string>
+    <string name="track_secondary">Secondary</string>
     <string name="btn_play">Play</string>
     <string name="btn_pause">Pause</string>
     <string name="ui_volume">Volume: %d%%</string>
@@ -103,7 +106,7 @@
     <string name="pref_auto_rotation_default" translatable="false">auto</string>
 
     <string name="pref_display_media_title_title">Display media title (videos)</string>
-    <string name="pref_display_media_title_summary">Display the media title or filename of videos is displayed above the controls. Audio files will always display their metadata.</string>
+    <string name="pref_display_media_title_summary">Display the title or filename of videos above the controls. Audio files will always display their metadata.</string>
 
     <string name="pref_bottom_controls_title">Show controls at bottom of screen</string>
 
@@ -116,10 +119,10 @@
     <string name="pref_gesture_horiz_title">Horizontal drag</string>
     <string name="pref_gesture_horiz_default" translatable="false">seek</string>
 
-    <string name="pref_gesture_vert_left_title">Vertical drag (left)</string>
+    <string name="pref_gesture_vert_left_title">Vertical drag (left side)</string>
     <string name="pref_gesture_vert_left_default" translatable="false">bright</string>
 
-    <string name="pref_gesture_vert_right_title">Vertical drag (right)</string>
+    <string name="pref_gesture_vert_right_title">Vertical drag (right side)</string>
     <string name="pref_gesture_vert_right_default" translatable="false">volume</string>
 
     <string name="pref_gesture_tap_left_title">Double tap (left)</string>
@@ -158,6 +161,9 @@
     <string name="pref_stats_mode_summary">Select which statistics are displayed</string>
 
     <string name="pref_gpu_debug_title">Enable OpenGL debugging</string>
+
+    <string name="pref_gpu_next_title">Use gpu-next</string>
+    <string name="pref_gpu_next_summary">Select brand-new video rendering backend, based on libplacebo.</string>
 
     <string name="pref_version_info">Version information</string>
 
