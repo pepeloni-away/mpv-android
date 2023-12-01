@@ -53,6 +53,13 @@ class MPVActivity : AppCompatActivity(), MPVLib.EventObserver, TouchGesturesObse
     // for use with stopServiceRunnable
     private val stopServiceHandler = Handler(Looper.getMainLooper())
 
+    // MPVLib.setOptionString doesn't log anything,
+    // write to file to get "Setting option 'option' = 'value' (flags)" in logs.
+    // val intentExtrasFile = File(applicationContext.filesDir.path, "intentExtras.conf")
+    private val intentExtrasFile by lazy {
+        File(applicationContext.filesDir, "intentExtras.conf")
+    }
+
     /**
      * DO NOT USE THIS
      */
@@ -335,6 +342,10 @@ class MPVActivity : AppCompatActivity(), MPVLib.EventObserver, TouchGesturesObse
     }
 
     override fun onDestroy() {
+        // options passed as intent extras should not stay after exiting
+        intentExtrasFile.writeText("")
+
+
         Log.v(TAG, "Exiting.")
 
         // Suppress any further callbacks
@@ -980,9 +991,6 @@ class MPVActivity : AppCompatActivity(), MPVLib.EventObserver, TouchGesturesObse
             }
         }
 
-        // MPVLib.setOptionString doesn't log anything,
-        // write to file to get "Setting option 'option' = 'value' (flags)" in logs.
-        val intentExtrasFile = File(applicationContext.filesDir.path, "intentExtras.conf")
         intentExtrasFile.writeText(intentOptions.joinToString("\n") { "${it.first}=${it.second}" })
     }
 
