@@ -60,8 +60,12 @@ class MPVActivity : AppCompatActivity(), MPVLib.EventObserver, TouchGesturesObse
     // write to file to get "Setting option 'option' = 'value' (flags)" in logs.
     // val intentExtrasFile = File(applicationContext.filesDir.path, "intentExtras.conf")
     private val intentExtrasFile by lazy {
-        File(applicationContext.filesDir, "intentExtras.conf")
+        val file = File(applicationContext.filesDir, "intentExtras.conf")
+        file.writeText("") // clear it in case app was removed from recents and didn't shutdown properly
+        file
     }
+    private var cliOptions = mutableListOf<Pair<String, String>>()
+    private var useIntentFile = false
 
     /**
      * DO NOT USE THIS
@@ -302,7 +306,7 @@ class MPVActivity : AppCompatActivity(), MPVLib.EventObserver, TouchGesturesObse
         }
 
         player.addObserver(this)
-        player.initialize(filesDir.path, cacheDir.path, filesDir.path + "/intentExtras.conf")
+        player.initialize(filesDir.path, cacheDir.path, filesDir.path + "/intentExtras.conf", cliOptions, useIntentFile)
         player.playFile(filepath)
 
         binding.playbackSeekbar.setOnSeekBarChangeListener(seekBarChangeListener)
@@ -1002,19 +1006,22 @@ class MPVActivity : AppCompatActivity(), MPVLib.EventObserver, TouchGesturesObse
         // pass every string key that starts with -- to mpv
         var intentOptions = mutableListOf<Pair<String, String>>()
         val allIntentOptions = extras.keySet().filter { it.startsWith("--") }
+        useIntentFile = extras.containsKey("_useIntentFile")
         for (option in allIntentOptions) {
             extras.getString(option)?.let { value ->
-                intentOptions.add(Pair(option, value))
+                if (useIntentFile) intentOptions.add(Pair(option, value)) else cliOptions.add(Pair(option, value))
             }
         }
         // also support title, standard among other android players
         if (extras.containsKey("title")) {
             extras.getString("title")?.let { value ->
-                intentOptions.add(Pair("--force-media-title", value))
+                if (useIntentFile) intentOptions.add(Pair("--force-media-title", value)) else cliOptions.add(Pair("--force-media-title", value))
             }
         }
 
-        intentExtrasFile.writeText(intentOptions.joinToString("\n") { "${it.first}=${it.second}" })
+        if (useIntentFile) {
+            intentExtrasFile.writeText(intentOptions.joinToString("\n") { "${it.first}=${it.second}" })
+        }
     }
 
     // UI (Part 2)

@@ -12,7 +12,7 @@ import android.view.*
 import kotlin.reflect.KProperty
 
 internal class MPVView(context: Context, attrs: AttributeSet) : SurfaceView(context, attrs), SurfaceHolder.Callback {
-    fun initialize(configDir: String, cacheDir: String, intentExtrasFile: String) {
+    fun initialize(configDir: String, cacheDir: String, intentExtrasFile: String, cliOptions: MutableList<Pair<String, String>>, useIntentFile: Boolean) {
         MPVLib.create(this.context)
         MPVLib.setOptionString("config", "yes")
         MPVLib.setOptionString("config-dir", configDir)
@@ -20,7 +20,16 @@ internal class MPVView(context: Context, attrs: AttributeSet) : SurfaceView(cont
             MPVLib.setOptionString(opt, cacheDir)
         initOptions() // do this before init() so user-supplied config can override our choices
         MPVLib.init()
-        MPVLib.setOptionString("include", intentExtrasFile)
+        if (useIntentFile) {
+            MPVLib.setOptionString("include", intentExtrasFile)
+        } else {
+            Log.v(TAG, "'''cli options'''")
+            for ((key, value) in cliOptions) {
+                MPVLib.setOptionString(key.substring(2), value)
+                Log.v(TAG, "$key=$value")
+            }
+            Log.v(TAG, "'''cli options end'''")
+        }
         /* Hardcoded options: */
         // we need to call write-watch-later manually
         MPVLib.setOptionString("save-position-on-quit", "no")
