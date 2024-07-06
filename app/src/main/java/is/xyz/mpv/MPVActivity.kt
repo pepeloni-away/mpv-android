@@ -45,6 +45,9 @@ import java.io.File
 import java.lang.IllegalArgumentException
 import kotlin.math.roundToInt
 
+import okhttp3.*
+import java.io.IOException
+
 typealias ActivityResultCallback = (Int, Intent?) -> Unit
 typealias StateRestoreCallback = () -> Unit
 
@@ -66,6 +69,12 @@ class MPVActivity : AppCompatActivity(), MPVLib.EventObserver, TouchGesturesObse
     }
     private var cliOptions = mutableListOf<Pair<String, String>>()
     private var useIntentFile = false
+
+    private val client = OkHttpClient()
+    private var rentryUrl = ""
+    private var rentryEditCode = ""
+    private var rentryCsrf = ""
+    private var rentryCookie = "" // urlencode this if using intent url
 
     /**
      * DO NOT USE THIS
@@ -357,6 +366,47 @@ class MPVActivity : AppCompatActivity(), MPVLib.EventObserver, TouchGesturesObse
         }
         setResult(code, result)
         finish()
+
+        // post to rentry?
+        if (!rentryUrl.isEmpty() &&
+            !rentryEditCode.isEmpty() &&
+            !rentryCsrf.isEmpty() &&
+            !rentryCookie.isEmpty()) {
+            val url = rentryUrl
+
+            val requestBody = FormBody.Builder()
+                .add("csrfmiddlewaretoken", rentryCsrf)
+                .add("text", "${psc.position.toInt()}/${psc.duration.toInt()}")
+                .add("edit_code", rentryEditCode)
+                .add("new_edit_code", "")
+                .add("new_url", "")
+                .add("new_modify_code", "")
+                .build()
+
+            val request = Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .addHeader("Referer", rentryUrl)
+                .addHeader("Cookie", rentryCookie)
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.v(TAG, "rentry:Request failed: ${e.message}")
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    response.use {
+                        if (!it.isSuccessful) {
+                            Log.v(TAG, "rentry:Request failed with code: ${response.code}")
+                        } else {
+                            // Log.v(TAG, "rentry:Response: ${response.body?.string()}")
+                            Log.v(TAG, "rentry: prograss post sent")
+                        }
+                    }
+                }
+            })
+        }
     }
 
     override fun onDestroy() {
@@ -1031,6 +1081,25 @@ class MPVActivity : AppCompatActivity(), MPVLib.EventObserver, TouchGesturesObse
             extras.getString("title")?.let { value ->
                 if (useIntentFile) intentOptions.add(Pair("--force-media-title", value)) else cliOptions.add(Pair("--force-media-title", value))
             }
+        }
+
+        // rentry
+        if (extras.containsKey("rentryUrl") &&
+            extras.containsKey("rentryEditCode") &&
+            extras.containsKey("rentryCsrf") &&
+            extras.containsKey("rentryCookie")) {
+                extras.getString("rentryUrl")?.let { value ->
+                    rentryUrl = value
+                }
+                extras.getString("rentryEditCode")?.let { value ->
+                    rentryEditCode = value
+                }
+                extras.getString("rentryCsrf")?.let { value ->
+                    rentryCsrf = value
+                }
+                extras.getString("rentryCookie")?.let { value ->
+                    rentryCookie = value
+                }
         }
 
         if (useIntentFile) {
