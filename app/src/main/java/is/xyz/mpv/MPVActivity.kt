@@ -75,6 +75,7 @@ class MPVActivity : AppCompatActivity(), MPVLib.EventObserver, TouchGesturesObse
     private var rentryEditCode = ""
     private var rentryCsrf = ""
     private var rentryCookie = "" // urlencode this if using intent url
+    private var rentryExternalID = "" // just received from intent and passed back in the rentry post
 
     /**
      * DO NOT USE THIS
@@ -376,7 +377,7 @@ class MPVActivity : AppCompatActivity(), MPVLib.EventObserver, TouchGesturesObse
 
             val requestBody = FormBody.Builder()
                 .add("csrfmiddlewaretoken", rentryCsrf)
-                .add("text", "${psc.position.toInt()}/${psc.duration.toInt()}")
+                .add("text", """{"progress":"${psc.position.toInt()}","total":"${psc.duration.toInt()}","id":"${rentryExternalID}"}""")
                 .add("edit_code", rentryEditCode)
                 .add("new_edit_code", "")
                 .add("new_url", "")
@@ -1099,6 +1100,9 @@ class MPVActivity : AppCompatActivity(), MPVLib.EventObserver, TouchGesturesObse
                 }
                 extras.getString("rentryCookie")?.let { value ->
                     rentryCookie = value
+                }
+                extras.getString("rentryID")?.let { value ->
+                    rentryExternalID = value
                 }
         }
 
